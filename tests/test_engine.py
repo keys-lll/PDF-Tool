@@ -177,6 +177,51 @@ class WorkspaceTests(unittest.TestCase):
                 source, backend="pdfium", cancel_event=cancel
             )
 
+    @unittest.skipUnless(
+        importlib.util.find_spec("pypdfium2") is not None
+        and importlib.util.find_spec("PIL") is not None,
+        "pypdfium2 and Pillow are not installed",
+    )
+    def test_pdfium_calls_are_serialized_across_threads(self) -> None:
+        barrier = threading.Barrier(2)
+        workspaces = []
+        sources = []
+        errors: list[BaseException] = []
+
+        try:
+            for index in range(2):
+                workspace = PdfWorkspace()
+                source = workspace.add_source(
+                    make_pdf(self.root / f"threaded-{index}.pdf", [300, 310])
+                )
+                workspace.inspect(source)
+                workspaces.append(workspace)
+                sources.append(source)
+
+            def render(workspace: PdfWorkspace, source) -> None:
+                try:
+                    barrier.wait(timeout=10)
+                    workspace.render_thumbnails(
+                        source, width=100, backend="pdfium"
+                    )
+                except BaseException as exc:  # collected for the main thread
+                    errors.append(exc)
+
+            threads = [
+                threading.Thread(target=render, args=(workspace, source))
+                for workspace, source in zip(workspaces, sources)
+            ]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join(timeout=30)
+
+            self.assertFalse(any(thread.is_alive() for thread in threads))
+            self.assertEqual(errors, [])
+        finally:
+            for workspace in workspaces:
+                workspace.close()
+
     def test_remove_source_and_cleanup(self) -> None:
         path = make_pdf(
             self.root / "cleanup.pdf",

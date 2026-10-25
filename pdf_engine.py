@@ -23,6 +23,11 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 
 
+# PDFium/pypdfium2 is not thread-safe. All PDFium calls must be serialized,
+# including opening, rendering and closing documents.
+_PDFIUM_LOCK = threading.Lock()
+
+
 class PdfWorkError(Exception):
     """An error that can be shown to the user as-is."""
 
@@ -320,6 +325,27 @@ class PdfWorkspace:
         return files[: source.page_count]
 
     def _render_thumbnails_pdfium(
+        self,
+        source: PdfSource,
+        output_dir: Path,
+        width: int,
+        cancel_event: threading.Event | None,
+    ) -> list[Path]:
+        # Serialize all PDFium work. It is safe to use PDFium from different
+        # threads only when no two calls overlap.
+        while True:
+            if cancel_event is not None and cancel_event.is_set():
+                raise ThumbnailCancelled()
+            if _PDFIUM_LOCK.acquire(timeout=0.1):
+                break
+        try:
+            return self._render_thumbnails_pdfium_locked(
+                source, output_dir, width, cancel_event
+            )
+        finally:
+            _PDFIUM_LOCK.release()
+
+    def _render_thumbnails_pdfium_locked(
         self,
         source: PdfSource,
         output_dir: Path,

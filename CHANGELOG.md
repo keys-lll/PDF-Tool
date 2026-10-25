@@ -15,10 +15,14 @@
 - 新增 packaged application 的 `--smoke-test` 自我檢查。
 - 新增 Windows GitHub Actions 建置與測試流程。
 
+### Fixed
+
+- 將所有 PDFium 呼叫序列化，避免 Windows 背景縮圖執行緒同時存取時發生原生當機。
+
 ### Changed
 
 - Python 執行期需求加入 pypdfium2 與 Pillow；Linux 套件仍優先使用 poppler。
-- 測試總數增加至 23 項。
+- 測試總數增加至 24 項，包含 PDFium 跨執行緒序列化測試。
 
 ## [1.0.1] - 2026-10-25
 

@@ -30,8 +30,9 @@ sudo apt install ./pdf-page-merger_1.1.0-1_all.deb
 - 新增內建 PDFium 縮圖後端，Windows 縮圖不再依賴外部 poppler。
 - 依平台選擇中文介面字型（Windows 使用 Microsoft JhengHei UI）。
 - 新增凍結應用程式的建置後 smoke test。
+- 將所有 PDFium 呼叫序列化，避免 Windows 多執行緒縮圖時發生原生當機。
 - 合併與密碼流程沿用 1.0.1 的進度對話框競態修正。
-- 測試總數為 23 項，涵蓋 PDFium 縮圖、取消、拖曳、解鎖與合併。
+- 測試總數為 24 項，涵蓋 PDFium 縮圖、跨執行緒序列化、取消、拖曳、解鎖與合併。
 
 ## 系統需求
 
