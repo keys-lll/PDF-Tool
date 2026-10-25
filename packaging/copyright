@@ -1,0 +1,14 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: pdf-page-merger
+Source: locally built
+
+Files: *
+Copyright: 2026 The PDF Page Merger authors
+License: Local-Use
+ This package was assembled for local use.  No license grant beyond use
+ by the package owner is implied by this packaging metadata.
+Comment:
+ The application uses PySide6, pypdf, cryptography, and poppler at
+ runtime.  Those components are supplied by Ubuntu packages and remain
+ under their respective upstream licenses.  No third-party source code
+ is bundled inside this package.

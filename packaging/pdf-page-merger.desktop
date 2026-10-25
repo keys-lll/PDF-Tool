@@ -1,0 +1,20 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=PDF 併頁器
+Name[en]=PDF Page Merger
+Name[zh_TW]=PDF 併頁器
+GenericName=PDF Page Merger
+GenericName[en]=PDF Page Merger
+GenericName[zh_TW]=PDF 頁面合併工具
+Comment=合併 PDF 並拖曳調整頁面順序
+Comment[en]=Merge PDF files and rearrange pages
+Comment[zh_TW]=合併 PDF 並拖曳調整頁面順序
+Exec=pdf-page-merger %F
+TryExec=pdf-page-merger
+Icon=pdf-page-merger
+Terminal=false
+Categories=Office;
+Keywords=PDF;merge;combine;pages;合併;排序;頁面;
+MimeType=application/pdf;
+StartupNotify=true

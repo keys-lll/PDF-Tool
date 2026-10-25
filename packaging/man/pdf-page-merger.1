@@ -1,0 +1,56 @@
+.TH PDF-PAGE-MERGER 1 "2026-10-25" "pdf-page-merger 1.0.0" "User Commands"
+.SH NAME
+pdf-page-merger \- merge PDF files and reorder pages
+.SH SYNOPSIS
+.B pdf-page-merger
+.RI [ file ...]
+.SH DESCRIPTION
+.B pdf-page-merger
+is a desktop application for combining multiple PDF files into one
+document.  Pages from every input file are shown as thumbnails; drag a
+thumbnail to change its position in the final document.
+.PP
+Encrypted PDFs are unlocked per file.  Passwords are kept in memory
+only.  When an encrypted file is unlocked, a temporary unencrypted copy
+is created in a private temporary directory for thumbnail rendering and
+merging.  The original files are never modified.
+.PP
+The merged PDF is written to a temporary file and atomically moved into
+place after the whole document has been generated.  The result is not
+encrypted.
+.SH OPTIONS
+The application does not define command line options.  Each non-option
+argument that ends in
+.B .pdf
+is opened in the initial page list.
+.SH ENVIRONMENT
+.TP
+.B QT_QPA_PLATFORM
+Standard Qt platform selector.  Set it to
+.B offscreen
+for automated/headless smoke tests.
+.TP
+.B QT_SCALE_FACTOR
+Standard Qt scaling override for high-DPI displays.
+.SH FILES
+.TP
+.I /tmp/pdf-page-merger-*
+Private working directory containing decrypted working copies and
+thumbnails for the current session.  It is removed on a normal exit.
+.SH NOTES
+Bookmarks, form fields, attachments, and digital signatures are not
+guaranteed to be preserved in the merged output.  Page content, page
+size, and page rotation are retained.
+.SH EXIT STATUS
+.TP
+.B 0
+Normal exit.
+.TP
+.B non-zero
+The application failed to start, or Python raised an unhandled error.
+.SH SEE ALSO
+.BR xdg-open (1),
+.BR pdftoppm (1),
+.BR qpdf (1)
+.SH AUTHOR
+Local Package Builder

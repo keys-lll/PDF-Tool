@@ -1,0 +1,10 @@
+pdf-page-merger (1.0.0-1) unstable; urgency=medium
+
+  * Initial local release.
+  * Merge multiple PDF files into one document.
+  * Reorder individual pages with draggable thumbnails.
+  * Unlock encrypted PDFs with a per-file password prompt.
+  * Render page thumbnails through poppler.
+  * Write the merged PDF atomically.
+
+ -- Local Package Builder <local@localhost>  Sun, 25 Oct 2026 12:00:00 +0800
