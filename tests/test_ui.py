@@ -119,6 +119,42 @@ class UiFlowTests(unittest.TestCase):
         self.assertFalse(self.window.toolbar_widget.isVisible())
         self.assertTrue(self.window.empty_title.text())
 
+    def test_progress_update_survives_completion_reentrancy(self) -> None:
+        class ReentrantProgress:
+            def __init__(self, window) -> None:
+                self.window = window
+                self.labels: list[str] = []
+                self.values: list[int] = []
+
+            def setMaximum(self, _value: int) -> None:
+                pass
+
+            def setLabelText(self, text: str) -> None:
+                self.labels.append(text)
+
+            def setValue(self, value: int) -> None:
+                self.values.append(value)
+                # QProgressDialog.setValue() processes events for modal
+                # dialogs. Simulate the worker's queued completion arriving
+                # and closing the dialog while setValue() is still running.
+                self.window._finish_merge()
+
+            def close(self) -> None:
+                pass
+
+            def deleteLater(self) -> None:
+                pass
+
+        progress = ReentrantProgress(self.window)
+        self.window._merge_progress = progress
+        self.window._merging = True
+        self.window._on_merge_progress(1, 2)
+
+        self.assertEqual(progress.labels, ["正在整理頁面… 1 / 2"])
+        self.assertEqual(progress.values, [1])
+        self.assertIsNone(self.window._merge_progress)
+        self.assertFalse(self.window._merging)
+
     def test_add_reorder_and_remove_pages(self) -> None:
         report = PROJECT / "tests" / "samples" / "季度營運報告.pdf"
         design = PROJECT / "tests" / "samples" / "設計提案_首頁改版.pdf"

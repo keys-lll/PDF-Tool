@@ -851,35 +851,44 @@ class MainWindow(QMainWindow):
         self.pool.start(worker)
 
     def _on_merge_progress(self, current: int, total: int) -> None:
-        if self._merge_progress is None:
+        # QProgressDialog.setValue() may process events for a modal dialog.
+        # A queued completion signal can therefore close the dialog during this
+        # method. Update the label first and set the value last so no access to
+        # self._merge_progress happens after that re-entrant event processing.
+        progress = self._merge_progress
+        if progress is None or not self._merging:
             return
-        self._merge_progress.setMaximum(total)
-        self._merge_progress.setValue(current)
+        progress.setMaximum(total)
         if current < total:
-            self._merge_progress.setLabelText(
-                f"正在整理頁面… {current} / {total}"
-            )
+            progress.setLabelText(f"正在整理頁面… {current} / {total}")
         else:
-            self._merge_progress.setLabelText("正在寫入 PDF…")
+            progress.setLabelText("正在寫入 PDF…")
+        progress.setValue(current)
 
     def _cancel_merge(self) -> None:
-        if self._merge_worker is None:
+        progress = self._merge_progress
+        worker = self._merge_worker
+        if worker is None or progress is None:
             return
-        self._merge_worker.cancel()
-        if self._merge_progress is not None:
-            self._merge_progress.setLabelText("正在取消合併…")
-            self._merge_progress.setCancelButton(None)
+        worker.cancel()
+        progress.setLabelText("正在取消合併…")
+        progress.setCancelButton(None)
 
     def _finish_merge(self) -> None:
-        if self._merge_progress is not None:
-            self._merge_progress.close()
-            self._merge_progress.deleteLater()
-            self._merge_progress = None
+        # Drop all references before closing the dialog: close() or event
+        # processing triggered by it may re-enter our slots.
+        progress = self._merge_progress
+        self._merge_progress = None
         self._merge_worker = None
         self._merging = False
+        if progress is not None:
+            progress.close()
+            progress.deleteLater()
         self._update_state()
 
     def _on_merge_succeeded(self, output: str) -> None:
+        if not self._merging:
+            return
         page_count = self._pending_merge_pages
         path = Path(output)
         self._last_output_dir = path.parent
@@ -888,11 +897,15 @@ class MainWindow(QMainWindow):
         self._show_merge_success(path, page_count)
 
     def _on_merge_failed(self, message: str) -> None:
+        if not self._merging:
+            return
         self._finish_merge()
         QMessageBox.critical(self, "合併失敗", message)
         self.statusBar().showMessage("合併失敗，未產生輸出檔。", 5000)
 
     def _on_merge_cancelled(self) -> None:
+        if not self._merging:
+            return
         self._finish_merge()
         self.statusBar().showMessage("已取消合併。", 3500)
 
