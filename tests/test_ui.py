@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import faulthandler
+import hashlib
 import os
 import sys
 import tempfile
@@ -278,8 +279,16 @@ class UiFlowTests(unittest.TestCase):
         self.assertTrue(output.exists(), "merge did not create an output file")
         reader = PdfReader(str(output))
         self.assertEqual(len(reader.pages), 9)
-        first_text = reader.pages[0].extract_text() or ""
-        self.assertIn("RECOMMENDATION", first_text)
+        # Verify page order by content stream, which is copied verbatim by
+        # pypdf and does not depend on platform font/text extraction support.
+        source_page = PdfReader(str(design)).pages[moved.page_index]
+        expected_content = hashlib.sha256(
+            source_page.get_contents().get_data()
+        ).digest()
+        first_content = hashlib.sha256(
+            reader.pages[0].get_contents().get_data()
+        ).digest()
+        self.assertEqual(first_content, expected_content)
         self.assertEqual(list(self.root.glob(".pdf-page-merger-*")), [])
         self.assertTrue(self.window.merge_button.isEnabled())
 
