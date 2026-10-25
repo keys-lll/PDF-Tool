@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import sys
 import tempfile
 import threading
@@ -138,6 +139,43 @@ class WorkspaceTests(unittest.TestCase):
         cancel.set()
         with self.assertRaises(ThumbnailCancelled):
             self.workspace.render_thumbnails(source, cancel_event=cancel)
+
+    @unittest.skipUnless(
+        importlib.util.find_spec("pypdfium2") is not None
+        and importlib.util.find_spec("PIL") is not None,
+        "pypdfium2 and Pillow are not installed",
+    )
+    def test_render_thumbnails_pdfium_backend(self) -> None:
+        from PIL import Image
+
+        path = make_pdf(self.root / "pdfium.pdf", [300, 310, 320])
+        source = self.workspace.add_source(path)
+        self.workspace.inspect(source)
+        thumbnails = self.workspace.render_thumbnails(
+            source, width=120, backend="pdfium"
+        )
+        self.assertEqual(len(thumbnails), 3)
+        for thumbnail in thumbnails:
+            self.assertTrue(thumbnail.exists())
+            with Image.open(thumbnail) as image:
+                self.assertEqual(image.format, "JPEG")
+                self.assertLessEqual(max(image.size), 120)
+
+    @unittest.skipUnless(
+        importlib.util.find_spec("pypdfium2") is not None
+        and importlib.util.find_spec("PIL") is not None,
+        "pypdfium2 and Pillow are not installed",
+    )
+    def test_pdfium_thumbnails_honour_cancellation(self) -> None:
+        path = make_pdf(self.root / "pdfium-cancel.pdf", [300, 310])
+        source = self.workspace.add_source(path)
+        self.workspace.inspect(source)
+        cancel = threading.Event()
+        cancel.set()
+        with self.assertRaises(ThumbnailCancelled):
+            self.workspace.render_thumbnails(
+                source, backend="pdfium", cancel_event=cancel
+            )
 
     def test_remove_source_and_cleanup(self) -> None:
         path = make_pdf(

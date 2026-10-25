@@ -19,7 +19,8 @@ PROJECT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT))
 
 from main_window import MainWindow  # noqa: E402
-from theme import APP_STYLE  # noqa: E402
+from platform_support import ui_font_family  # noqa: E402
+from theme import build_stylesheet  # noqa: E402
 from ui_pages import PAGE_REF_ROLE  # noqa: E402
 from ui_widgets import PasswordDialog  # noqa: E402
 
@@ -82,8 +83,9 @@ class UiFlowTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.app = QApplication.instance() or QApplication(sys.argv)
         cls.app.setStyle("Fusion")
-        cls.app.setFont(QFont("Noto Sans CJK TC", 10))
-        cls.app.setStyleSheet(APP_STYLE)
+        family = ui_font_family()
+        cls.app.setFont(QFont(family, 10))
+        cls.app.setStyleSheet(build_stylesheet(family))
 
     def setUp(self) -> None:
         required = [
@@ -275,7 +277,7 @@ class UiFlowTests(unittest.TestCase):
         reader = PdfReader(str(output))
         self.assertEqual(len(reader.pages), 9)
         first_text = reader.pages[0].extract_text() or ""
-        self.assertIn("三個設計原則", first_text)
+        self.assertIn("RECOMMENDATION", first_text)
         self.assertEqual(list(self.root.glob(".pdf-page-merger-*")), [])
         self.assertTrue(self.window.merge_button.isEnabled())
 

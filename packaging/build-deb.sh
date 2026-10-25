@@ -3,7 +3,7 @@ set -euo pipefail
 
 APP_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 PACKAGE="pdf-page-merger"
-VERSION="${VERSION:-1.0.1}"
+VERSION="${VERSION:-1.1.0}"
 REVISION="${REVISION:-1}"
 ARCH="all"
 FULL_VERSION="${VERSION}-${REVISION}"
@@ -20,7 +20,7 @@ for tool in dpkg-deb gzip install; do
     fi
 done
 
-for file in main.py main_window.py pdf_engine.py workers.py ui_pages.py ui_widgets.py icons.py theme.py; do
+for file in main.py main_window.py pdf_engine.py workers.py ui_pages.py ui_widgets.py icons.py theme.py platform_support.py; do
     if [ ! -f "$APP_DIR/$file" ]; then
         echo "缺少應用程式檔案：$file" >&2
         exit 1
@@ -38,7 +38,7 @@ mkdir -p \
     "$STAGE/usr/share/man/man1" \
     "$STAGE/usr/share/doc/$PACKAGE/docs"
 
-for file in main.py main_window.py pdf_engine.py workers.py ui_pages.py ui_widgets.py icons.py theme.py; do
+for file in main.py main_window.py pdf_engine.py workers.py ui_pages.py ui_widgets.py icons.py theme.py platform_support.py; do
     install -m644 "$APP_DIR/$file" "$STAGE/usr/lib/$PACKAGE/$file"
 done
 
@@ -68,6 +68,8 @@ install -m644 "$APP_DIR/docs/release-notes-v1.0.0.md" \
     "$STAGE/usr/share/doc/$PACKAGE/docs/release-notes-v1.0.0.md"
 install -m644 "$APP_DIR/docs/release-notes-v1.0.1.md" \
     "$STAGE/usr/share/doc/$PACKAGE/docs/release-notes-v1.0.1.md"
+install -m644 "$APP_DIR/docs/release-notes-v1.1.0.md" \
+    "$STAGE/usr/share/doc/$PACKAGE/docs/release-notes-v1.1.0.md"
 install -m644 "$APP_DIR/packaging/copyright" "$STAGE/usr/share/doc/$PACKAGE/copyright"
 install -m644 "$APP_DIR/docs/screenshot.png" "$STAGE/usr/share/doc/$PACKAGE/docs/screenshot.png"
 install -m644 "$APP_DIR/docs/password-dialog.png" "$STAGE/usr/share/doc/$PACKAGE/docs/password-dialog.png"

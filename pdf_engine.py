@@ -206,15 +206,46 @@ class PdfWorkspace:
         source: PdfSource,
         width: int = 360,
         cancel_event: threading.Event | None = None,
+        backend: str = "auto",
     ) -> list[Path]:
-        """Render every page to a compact JPEG and return the paths in order."""
+        """Render every page to a compact JPEG and return the paths in order.
+
+        The default backend uses pdftoppm when it is available and otherwise
+        falls back to the bundled PDFium renderer. The fallback makes the
+        Windows build independent of an external poppler installation.
+        """
         if not source.is_ready or source.working_path is None:
             raise PdfWorkError("這份 PDF 尚未解鎖。")
-        tool = shutil.which("pdftoppm")
-        if not tool:
-            raise PdfWorkError("找不到縮圖工具 pdftoppm，請先安裝 poppler-utils。")
+        if cancel_event is not None and cancel_event.is_set():
+            raise ThumbnailCancelled()
+        if width <= 0:
+            raise PdfWorkError("縮圖尺寸無效。")
 
+        tool = shutil.which("pdftoppm")
+        if backend == "auto":
+            backend = "poppler" if tool else "pdfium"
         output_dir = self.thumbnail_dir(source.id)
+
+        if backend == "poppler":
+            if not tool:
+                raise PdfWorkError("找不到縮圖工具 pdftoppm，請安裝 poppler-utils。")
+            return self._render_thumbnails_poppler(
+                source, output_dir, width, cancel_event, tool
+            )
+        if backend == "pdfium":
+            return self._render_thumbnails_pdfium(
+                source, output_dir, width, cancel_event
+            )
+        raise ValueError(f"Unknown thumbnail backend: {backend}")
+
+    def _render_thumbnails_poppler(
+        self,
+        source: PdfSource,
+        output_dir: Path,
+        width: int,
+        cancel_event: threading.Event | None,
+        tool: str,
+    ) -> list[Path]:
         prefix = output_dir / "page"
         command = [
             tool,
@@ -287,6 +318,67 @@ class PdfWorkspace:
         if not files:
             raise PdfWorkError("沒有產生任何縮圖，但 PDF 仍可直接合併。")
         return files[: source.page_count]
+
+    def _render_thumbnails_pdfium(
+        self,
+        source: PdfSource,
+        output_dir: Path,
+        width: int,
+        cancel_event: threading.Event | None,
+    ) -> list[Path]:
+        try:
+            import pypdfium2 as pdfium
+            from PIL import Image  # noqa: F401  (PyInstaller must collect Pillow)
+        except ImportError as exc:
+            raise PdfWorkError(
+                "找不到縮圖工具。請安裝 poppler-utils，或安裝 pypdfium2 與 Pillow。"
+            ) from exc
+
+        document = None
+        paths: list[Path] = []
+        try:
+            document = pdfium.PdfDocument(str(source.working_path))
+            page_count = min(source.page_count, len(document))
+            if page_count <= 0:
+                raise PdfWorkError("沒有可產生縮圖的頁面。")
+
+            for page_index in range(page_count):
+                if cancel_event is not None and cancel_event.is_set():
+                    raise ThumbnailCancelled()
+                page = None
+                bitmap = None
+                image = None
+                try:
+                    page = document[page_index]
+                    page_width, page_height = page.get_size()
+                    longest_side = max(page_width, page_height)
+                    if longest_side <= 0:
+                        raise PdfWorkError("頁面尺寸無效，無法產生縮圖。")
+                    bitmap = page.render(scale=width / longest_side)
+                    image = bitmap.to_pil()
+                    output_path = output_dir / f"page-{page_index + 1}.jpg"
+                    image.save(output_path, "JPEG", quality=85)
+                    paths.append(output_path)
+                finally:
+                    if image is not None:
+                        image.close()
+                    if bitmap is not None:
+                        bitmap.close()
+                    if page is not None:
+                        page.close()
+
+            if cancel_event is not None and cancel_event.is_set():
+                raise ThumbnailCancelled()
+            if not paths:
+                raise PdfWorkError("沒有產生任何縮圖，但 PDF 仍可直接合併。")
+            return paths
+        except (ThumbnailCancelled, PdfWorkError):
+            raise
+        except Exception as exc:
+            raise PdfWorkError(f"無法產生縮圖：{exc}") from exc
+        finally:
+            if document is not None:
+                document.close()
 
     def close(self) -> None:
         if self._closed:

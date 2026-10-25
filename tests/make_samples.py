@@ -22,6 +22,12 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import QApplication
 from pypdf import PdfReader, PdfWriter
 
+PROJECT = Path(__file__).resolve().parent.parent
+if str(PROJECT) not in sys.path:
+    sys.path.insert(0, str(PROJECT))
+
+from platform_support import ui_font_family
+
 W, H = 1190, 1684
 CREAM = QColor("#F8F5EE")
 INK = QColor("#1E3630")
@@ -33,8 +39,8 @@ AMBER = QColor("#E8A24B")
 LINE = QColor("#DDD6C9")
 
 
-def font(size: int, weight: QFont.Weight = QFont.Weight.Normal, family="Noto Sans CJK TC"):
-    value = QFont(family)
+def font(size: int, weight: QFont.Weight = QFont.Weight.Normal, family: str | None = None):
+    value = QFont(family or ui_font_family())
     value.setPixelSize(size)
     value.setWeight(weight)
     return value

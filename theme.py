@@ -437,3 +437,8 @@ QToolTip {
     font-size: 8.5pt;
 }
 """
+
+
+def build_stylesheet(font_family: str) -> str:
+    """Return the app stylesheet using the platform's preferred UI font."""
+    return APP_STYLE.replace('"Noto Sans CJK TC"', f'"{font_family}"')

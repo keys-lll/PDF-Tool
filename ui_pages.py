@@ -25,6 +25,8 @@ from PySide6.QtWidgets import (
     QStyleOptionViewItem,
 )
 
+from platform_support import ui_font_family
+
 
 PAGE_REF_ROLE = Qt.ItemDataRole.UserRole + 1
 THUMB_LOADING_ROLE = Qt.ItemDataRole.UserRole + 2
@@ -114,7 +116,7 @@ class PageCardDelegate(QStyledItemDelegate):
 
         caption_left = card.left() + 12
         caption_width = card.width() - 24
-        title_font = QFont("Noto Sans CJK TC")
+        title_font = QFont(ui_font_family())
         title_font.setPixelSize(12)
         title_font.setWeight(QFont.Weight.DemiBold)
         painter.setFont(title_font)
@@ -129,7 +131,7 @@ class PageCardDelegate(QStyledItemDelegate):
             title,
         )
 
-        meta_font = QFont("Noto Sans CJK TC")
+        meta_font = QFont(ui_font_family())
         meta_font.setPixelSize(11)
         painter.setFont(meta_font)
         painter.setPen(QColor("#6D7B76"))
@@ -165,7 +167,7 @@ class PageCardDelegate(QStyledItemDelegate):
                 1.5,
             )
 
-        font = QFont("Noto Sans CJK TC")
+        font = QFont(ui_font_family())
         font.setPixelSize(10)
         painter.setFont(font)
         painter.setPen(QColor("#9A9387"))
@@ -181,7 +183,7 @@ class PageCardDelegate(QStyledItemDelegate):
         )
 
     def _draw_number(self, painter: QPainter, area: QRectF, number: int) -> None:
-        font = QFont("Noto Sans CJK TC")
+        font = QFont(ui_font_family())
         font.setPixelSize(11)
         font.setWeight(QFont.Weight.Bold)
         painter.setFont(font)

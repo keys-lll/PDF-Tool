@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# 在完成 `gh auth login` 之後，建立 GitHub 倉庫、推送 main 與 v1.0.1，
+# 在完成 `gh auth login` 之後，建立 GitHub 倉庫、推送 main 與 v1.1.0，
 # 並建立附帶 .deb 的 GitHub Release。
 #
 # 用法：
@@ -15,10 +15,11 @@ cd -- "$ROOT_DIR"
 
 REPO_NAME="${REPO_NAME:-pdf-page-merger}"
 VISIBILITY="${VISIBILITY:-private}"
-TAG="v1.0.1"
-DEB="$ROOT_DIR/dist/pdf-page-merger_1.0.1-1_all.deb"
+TAG="v1.1.0"
+DEB="$ROOT_DIR/dist/pdf-page-merger_1.1.0-1_all.deb"
 SUMS="$ROOT_DIR/dist/SHA256SUMS"
-NOTES="$ROOT_DIR/docs/release-notes-v1.0.1.md"
+WINDOWS_ZIP="$ROOT_DIR/dist/PDF-Page-Merger-1.1.0-windows-x64.zip"
+NOTES="$ROOT_DIR/docs/release-notes-v1.1.0.md"
 DESCRIPTION="PDF 併頁器 — merge PDFs and reorder pages with per-file password support"
 
 case "$VISIBILITY" in
@@ -79,6 +80,13 @@ if [ ! -f "$NOTES" ]; then
     exit 1
 fi
 
+ASSETS=("$DEB" "$SUMS")
+if [ -f "$WINDOWS_ZIP" ]; then
+    ASSETS+=("$WINDOWS_ZIP")
+else
+    echo "提示：找不到 Windows zip，將只發佈 Linux 套件。"
+fi
+
 if git remote get-url origin >/dev/null 2>&1; then
     echo "使用既有 origin：$(git remote get-url origin)"
     git push -u origin main
@@ -98,10 +106,10 @@ if gh release view "$TAG" >/dev/null 2>&1; then
     gh release edit "$TAG" \
         --title="PDF 併頁器 $TAG" \
         --notes-file="$NOTES"
-    gh release upload "$TAG" "$DEB" "$SUMS" --clobber
+    gh release upload "$TAG" "${ASSETS[@]}" --clobber
 else
     echo "建立 Release $TAG…"
-    gh release create "$TAG" "$DEB" "$SUMS" \
+    gh release create "$TAG" "${ASSETS[@]}" \
         --title="PDF 併頁器 $TAG" \
         --notes-file="$NOTES" \
         --verify-tag

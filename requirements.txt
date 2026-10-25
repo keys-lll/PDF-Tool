@@ -1,3 +1,5 @@
 PySide6>=6.6,<7
 pypdf>=5.0,<7
 cryptography>=42
+pypdfium2>=4.30
+Pillow>=10

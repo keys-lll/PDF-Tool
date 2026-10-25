@@ -10,7 +10,7 @@ if [ ! -x "$PYTHON" ]; then
     python3 -m venv --system-site-packages "$APP_DIR/.venv"
 fi
 
-if ! "$PYTHON" -c "import PySide6, pypdf, cryptography" >/dev/null 2>&1; then
+if ! "$PYTHON" -c "import PySide6, pypdf, cryptography, pypdfium2, PIL" >/dev/null 2>&1; then
     echo "首次啟動：安裝相依套件…"
     "$PYTHON" -m pip install --upgrade pip
     "$PYTHON" -m pip install -r "$APP_DIR/requirements.txt"

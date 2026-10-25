@@ -14,6 +14,8 @@ from PySide6.QtGui import (
     QPixmap,
 )
 
+from platform_support import ui_font_family
+
 ACCENT = QColor("#0F766E")
 DEEP_ACCENT = QColor("#115E59")
 
@@ -136,7 +138,7 @@ def pdf_badge_pixmap(height: int = 44) -> QPixmap:
     painter.setBrush(QColor("#B95D3F"))
     painter.drawPath(fold)
 
-    font = QFont("Noto Sans CJK TC")
+    font = QFont(ui_font_family())
     font.setPixelSize(max(6, round(height * 0.17)))
     font.setWeight(QFont.Weight.Bold)
     painter.setFont(font)
