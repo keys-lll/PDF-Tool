@@ -63,6 +63,7 @@ chmod 644 "$STAGE/usr/share/man/man1/pdf-page-merger.1.gz" \
     "$STAGE/usr/share/doc/$PACKAGE/changelog.Debian.gz"
 
 install -m644 "$APP_DIR/README.md" "$STAGE/usr/share/doc/$PACKAGE/README.md"
+install -m644 "$APP_DIR/docs/INSTALL.md" "$STAGE/usr/share/doc/$PACKAGE/docs/INSTALL.md"
 install -m644 "$APP_DIR/CHANGELOG.md" "$STAGE/usr/share/doc/$PACKAGE/CHANGELOG.md"
 install -m644 "$APP_DIR/docs/release-notes-v1.0.0.md" \
     "$STAGE/usr/share/doc/$PACKAGE/docs/release-notes-v1.0.0.md"

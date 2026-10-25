@@ -1,93 +1,55 @@
 # PDF 併頁器
 
-本機桌面工具：把多份 PDF 合併成一份，並用縮圖逐頁調整順序。加密的 PDF 會在加入時逐份詢問密碼；當下不想輸入也可以先跳過，之後再從左側清單解鎖。
-
-目前版本：**1.1.0** · [版本歷程](CHANGELOG.md) · [v1.1.0 發佈說明](docs/release-notes-v1.1.0.md)
+把散落在多份 PDF 裡的頁面，整理成一份真正需要的文件。所有頁面用縮圖呈現，
+直接拖曳就能調整順序；遇到加密 PDF，也能逐檔解鎖，不必先另外解密。
 
 ![PDF 併頁器主畫面](docs/screenshot.png)
 
 ## 功能
 
-- 一次加入多份 PDF，支援拖放檔案到視窗。
-- 加密 PDF 逐檔輸入密碼；支援密碼錯誤後直接重試。
-- 可跳過密碼，來源會保留在左側，之後按「解鎖」再加入頁面。
-- 所有 PDF 的頁面會排成同一個縮圖畫廊。
-- 直接拖曳縮圖即時換位；靠近上下邊緣會自動捲動，也可用「上移／下移」按鈕。
-- 可多選頁面後刪除（Delete）。
-- 有未解鎖檔案時會明確提醒，合併前再次確認。
-- 合併結果以暫存檔寫入後原子替換，避免留下半成品。
-- 密碼框可切換顯示密碼；高 DPI 縮圖與中英文檔名皆支援。
+### 多份 PDF，一次整理
 
-## 安裝 Debian／Ubuntu 套件
+- 一次加入多份 PDF，也可以直接拖放檔案到視窗。
+- 所有來源的頁面集中在同一個縮圖畫廊，不再需要反覆開檔、複製、貼上。
+- 每頁保留來源檔名與原始頁碼，整理時不會迷失。
 
-已提供可直接用 apt 安裝的 `.deb`：
+### 直覺的頁序調整
 
-```bash
-cd /home/liao/.zcode/workspace/449f8f0c-0603-4541-b26e-8bccd39a56b8/pdf-merger
-sudo apt install ./dist/pdf-page-merger_1.1.0-1_all.deb
-```
+- 拖曳縮圖即時換位；靠近視窗上下邊緣時會自動捲動。
+- 也可使用「上移／下移」按鈕，或 `Alt+↑`、`Alt+↓` 微調。
+- 支援多選頁面，按 `Delete` 即可移除不需要的頁面。
+- 頁面編號與頁數摘要會隨順序即時更新。
 
-apt 會自動補齊 `python3-pypdf` 等缺少的依賴；安裝後可從應用程式選單啟動「PDF 併頁器」，或執行：
+### 加密 PDF 逐檔解鎖
 
-```bash
-pdf-page-merger
-```
+- 加入加密 PDF 時，會單獨詢問該檔密碼。
+- 密碼錯誤可直接重試，不需要重新加入檔案。
+- 當下不想輸入密碼也可以先取消；來源會保留在左側，之後再按「解鎖」。
+- 有尚未解鎖的 PDF 時會明確提醒，不會在不知情的情況下漏掉頁面。
 
-驗證下載的套件：
+![密碼對話框](docs/password-dialog.png)
 
-```bash
-cd dist
-sha256sum -c SHA256SUMS
-```
+### 安全地輸出
 
-移除：
+- 合併前再次確認頁序與未解鎖來源。
+- 輸出先寫入暫存檔，再原子替換，避免產生損壞的半成品。
+- 完成後可直接開啟 PDF 或所在資料夾。
+- 來源 PDF 不會被修改；輸出是一份新的 PDF。
 
-```bash
-sudo apt remove pdf-page-merger
-```
+### 為桌面設計的介面
 
-## Windows 可攜版
-
-Windows 10／11 x64 版本以免安裝 zip 提供。從 GitHub Release 下載
-`PDF-Page-Merger-1.1.0-windows-x64.zip`，解壓縮後直接執行資料夾內的
-`PDF-Page-Merger.exe`。不需要 Python，也不需要管理員權限；`_internal`
-資料夾必須與 exe 放在一起。
-
-這是未簽章的執行檔，Windows SmartScreen 可能提示警告。確認檔案來自本專案
-Release 後，可選「更多資訊」→「仍要執行」。Windows 版內建 PDFium 縮圖引擎，
-不需要安裝 poppler。
-
-## 從原始碼啟動
-
-```bash
-cd /home/liao/.zcode/workspace/449f8f0c-0603-4541-b26e-8bccd39a56b8/pdf-merger
-./run.sh
-```
-
-第一次啟動時，`run.sh` 會建立 `.venv` 並安裝缺少的套件。也可以直接把 PDF 拖到 `run.sh` 上，或執行：
-
-```bash
-./run.sh 報告.pdf 附件.pdf
-```
-
-若不用 `.deb`，可另外建立原始碼版本的選單捷徑（不要和 `.deb` 版本同時安裝，以免選單出現兩個相同項目）：
-
-```bash
-./install-desktop-entry.sh
-```
-
-之後可以在應用程式選單搜尋「PDF 併頁器」。若把資料夾搬家，重新執行一次即可更新捷徑。
+- 原生 PySide6 桌面程式，支援高 DPI 與中英文檔名。
+- Linux 與 Windows 使用各自適合的中文字型。
+- 縮圖在背景產生，不阻塞主要操作；可安全取消與清理。
+- 清楚的來源狀態、頁數摘要與操作提示。
 
 ## 操作方式
 
 1. 按「新增 PDF 檔案」，或把多份 PDF 拖進視窗。
-2. 遇到加密檔案時輸入該檔密碼。按「取消」不會刪掉來源，之後按來源右側的「解鎖」即可。
-
-   <img src="docs/password-dialog.png" width="430" alt="加密 PDF 的密碼對話框，顯示錯誤密碼提示">
-
-3. 在右側縮圖畫廊拖曳頁面，調整成想要的合併順序。
-4. 按右上角「合併並儲存…」，選擇輸出位置。
-5. 完成後可直接開啟 PDF 或所在資料夾。
+2. 遇到加密檔時輸入密碼；按「取消」可稍後再解鎖。
+3. 拖曳縮圖調整頁序，或使用上移／下移按鈕。
+4. 按「合併並儲存…」選擇輸出位置。
+5. 完成後直接開啟 PDF 或資料夾。
 
 ### 快速鍵
 
@@ -100,107 +62,21 @@ cd /home/liao/.zcode/workspace/449f8f0c-0603-4541-b26e-8bccd39a56b8/pdf-merger
 | 移除選取頁面 | `Delete` |
 | 結束程式 | `Ctrl+Q` |
 
-## 密碼與暫存檔
+## 平台支援
 
-- 密碼只存在記憶體中，用來讓 pypdf 解鎖與建立工作副本，不會寫入設定檔或日誌。
-- 加密 PDF 解鎖後會在系統暫存資料夾建立權限受限的工作副本；縮圖也放在同一個資料夾（Linux 通常為 `/tmp/pdf-page-merger-*`，Windows 為 `%TEMP%\pdf-page-merger-*`）。
-- 正常關閉程式時會刪除整個暫存資料夾。若程式被強制終止，暫存檔可能留在系統暫存目錄，可手動刪除。
-- 來源 PDF 永遠不會被修改；輸出檔是新的、未加密的 PDF。
-- 合併結果不會保留書籤、表單欄位、附件或數位簽章的有效性。頁面內容、尺寸與旋轉會保留。
+- **Linux**：提供 Debian／Ubuntu `.deb`，包含桌面選單、icon 與 man page。
+- **Windows**：Windows 10／11 x64 免安裝可攜版，解壓縮後直接執行。
+- Windows 版不需要安裝 Python、poppler 或管理員權限。
 
-## 環境需求
+## 隱私與檔案處理
 
-- Linux 桌面環境，Python 3.10 以上；`.deb` 以 Ubuntu 26.04／Debian 的套件名建置。
-- Windows 10／11 x64 可攜版已包含 PySide6、pypdf、cryptography、PDFium 與 Pillow，不需要安裝 Python。
-- `.deb` 的執行期依賴：`python3-pyside6.qtwidgets`、`python3-pypdf`、`python3-cryptography`、`poppler-utils`。apt 會自動安裝缺少的項目。
-- 從原始碼啟動時，`run.sh` 會在 `.venv` 安裝 `requirements.txt` 的套件（含 pypdfium2 與 Pillow）。
-- `.deb` 建議安裝 `fonts-noto-cjk`（中文字型）與 `xdg-utils`（開啟輸出 PDF）；兩者列為 Recommends。
-- Linux 沒有 `poppler-utils` 時會改用內建的 PDFium 後端；Windows 版不需要 poppler。
+- 密碼只存在本次執行的記憶體中，不會寫入設定檔或日誌。
+- 加密 PDF 解鎖後的工作副本與縮圖存放在系統暫存資料夾，正常關閉程式後刪除。
+- 合併結果是新的、未加密的 PDF。
+- 合併不會保證保留書籤、表單欄位、附件或數位簽章。
 
-以 Debian／Ubuntu 手動補齊縮圖工具：
+## 更多
 
-```bash
-sudo apt install poppler-utils
-```
-
-## 重新打包 `.deb`
-
-```bash
-./packaging/build-deb.sh
-```
-
-輸出為 `dist/pdf-page-merger_1.1.0-1_all.deb`，並附上 `dist/SHA256SUMS`。可用環境變數改版號：
-
-```bash
-VERSION=1.1.0 REVISION=1 ./packaging/build-deb.sh
-```
-
-建置 Linux 套件只需要 `dpkg-deb`、`gzip` 與 `desktop-file-validate`（後者為選用驗證）。
-
-Windows 可攜版由 GitHub Actions 的 Windows runner 建置：
-
-```bash
-gh workflow run windows.yml
-```
-
-或參考 `windows/build.ps1` 在 Windows 本機執行 PyInstaller。
-
-## 發佈到 GitHub
-
-版本庫已包含 `v1.1.0` 標籤與發佈說明。登入 GitHub CLI 後可一次建立遠端、推送並建立 Release：
-
-```bash
-sudo apt install gh
-gh auth login
-./packaging/publish-github.sh
-```
-
-預設建立**私有**倉庫；若要公開，使用：
-
-```bash
-VISIBILITY=public ./packaging/publish-github.sh
-```
-
-腳本會附上 `.deb` 與 `SHA256SUMS` 到 GitHub Release。
-
-## 測試
-
-先執行一次 `./run.sh` 建立 `.venv`（或手動建立虛擬環境並安裝 `requirements.txt`），再執行：
-
-```bash
-cd /home/liao/.zcode/workspace/449f8f0c-0603-4541-b26e-8bccd39a56b8/pdf-merger
-QT_QPA_PLATFORM=offscreen .venv/bin/python tests/make_samples.py
-QT_QPA_PLATFORM=offscreen .venv/bin/python -m unittest discover -s tests -p 'test_*.py' -v
-```
-
-測試涵蓋：
-
-- 加密 PDF 的密碼需求、錯誤密碼、正確解鎖，以及只有擁有者密碼的情況。
-- 解密工作副本、縮圖產生與取消。
-- 任意頁序合併、重複頁、取消合併、拒絕覆蓋來源、錯誤清理。
-- GUI 的加入檔案、縮圖載入、實際滑鼠拖曳換位、頁面刪除、解鎖狀態、合併輸出。
-
-範例檔會產生在 `tests/samples/`，其中 `機密_董事會附件.pdf` 的密碼是 `open123`。可直接用來試工具。
-
-## 專案結構
-
-```text
-pdf-merger/
-├── main.py                  # 程式入口
-├── main_window.py           # 主視窗與操作流程
-├── ui_pages.py              # 頁面縮圖畫廊、拖曳排序
-├── ui_widgets.py            # 來源列、密碼對話框
-├── pdf_engine.py            # 解密、縮圖、合併（無 Qt 相依）
-├── workers.py               # 背景縮圖與合併工作
-├── icons.py / theme.py      # 介面圖示與樣式
-├── platform_support.py      # Windows／Linux 字型選擇
-├── assets/                  # SVG／PNG／ICO 應用程式圖示
-├── packaging/               # .deb 建置腳本、desktop、man、授權與 changelog
-├── windows/                 # Windows PyInstaller 建置腳本、icon resource、使用說明
-├── .github/workflows/       # Windows CI 建置流程
-├── dist/                    # 建置產物：.deb、Windows zip 與 SHA256SUMS
-├── tests/                   # 單元測試、GUI 測試、範例 PDF 產生器
-├── THIRD_PARTY_NOTICES.md   # Windows bundle 的第三方授權說明
-├── run.sh
-└── install-desktop-entry.sh
-```
+- [安裝、建置與測試](docs/INSTALL.md)
+- [版本歷程](CHANGELOG.md)
+- [下載最新版本](https://github.com/keys-lll/PDF-Tool/releases)
