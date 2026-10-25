@@ -2,7 +2,7 @@
 
 本機桌面工具：把多份 PDF 合併成一份，並用縮圖逐頁調整順序。加密的 PDF 會在加入時逐份詢問密碼；當下不想輸入也可以先跳過，之後再從左側清單解鎖。
 
-目前版本：**1.0.1** · [版本歷程](CHANGELOG.md) · [v1.0.1 發佈說明](docs/release-notes-v1.0.1.md)
+目前版本：**1.1.0** · [版本歷程](CHANGELOG.md) · [v1.1.0 發佈說明](docs/release-notes-v1.1.0.md)
 
 ![PDF 併頁器主畫面](docs/screenshot.png)
 
@@ -24,7 +24,7 @@
 
 ```bash
 cd /home/liao/.zcode/workspace/449f8f0c-0603-4541-b26e-8bccd39a56b8/pdf-merger
-sudo apt install ./dist/pdf-page-merger_1.0.1-1_all.deb
+sudo apt install ./dist/pdf-page-merger_1.1.0-1_all.deb
 ```
 
 apt 會自動補齊 `python3-pypdf` 等缺少的依賴；安裝後可從應用程式選單啟動「PDF 併頁器」，或執行：
@@ -45,6 +45,17 @@ sha256sum -c SHA256SUMS
 ```bash
 sudo apt remove pdf-page-merger
 ```
+
+## Windows 可攜版
+
+Windows 10／11 x64 版本以免安裝 zip 提供。從 GitHub Release 下載
+`PDF-Page-Merger-1.1.0-windows-x64.zip`，解壓縮後直接執行資料夾內的
+`PDF-Page-Merger.exe`。不需要 Python，也不需要管理員權限；`_internal`
+資料夾必須與 exe 放在一起。
+
+這是未簽章的執行檔，Windows SmartScreen 可能提示警告。確認檔案來自本專案
+Release 後，可選「更多資訊」→「仍要執行」。Windows 版內建 PDFium 縮圖引擎，
+不需要安裝 poppler。
 
 ## 從原始碼啟動
 
@@ -92,18 +103,19 @@ cd /home/liao/.zcode/workspace/449f8f0c-0603-4541-b26e-8bccd39a56b8/pdf-merger
 ## 密碼與暫存檔
 
 - 密碼只存在記憶體中，用來讓 pypdf 解鎖與建立工作副本，不會寫入設定檔或日誌。
-- 加密 PDF 解鎖後會在 `/tmp/pdf-page-merger-*` 建立權限 `0700` 的暫存工作副本；縮圖也放在同一個資料夾。
-- 正常關閉程式時會刪除整個暫存資料夾。若程式被強制終止，暫存檔可能留在 `/tmp`，可手動刪除。
+- 加密 PDF 解鎖後會在系統暫存資料夾建立權限受限的工作副本；縮圖也放在同一個資料夾（Linux 通常為 `/tmp/pdf-page-merger-*`，Windows 為 `%TEMP%\pdf-page-merger-*`）。
+- 正常關閉程式時會刪除整個暫存資料夾。若程式被強制終止，暫存檔可能留在系統暫存目錄，可手動刪除。
 - 來源 PDF 永遠不會被修改；輸出檔是新的、未加密的 PDF。
 - 合併結果不會保留書籤、表單欄位、附件或數位簽章的有效性。頁面內容、尺寸與旋轉會保留。
 
 ## 環境需求
 
 - Linux 桌面環境，Python 3.10 以上；`.deb` 以 Ubuntu 26.04／Debian 的套件名建置。
+- Windows 10／11 x64 可攜版已包含 PySide6、pypdf、cryptography、PDFium 與 Pillow，不需要安裝 Python。
 - `.deb` 的執行期依賴：`python3-pyside6.qtwidgets`、`python3-pypdf`、`python3-cryptography`、`poppler-utils`。apt 會自動安裝缺少的項目。
-- 從原始碼啟動時，`run.sh` 會在 `.venv` 安裝 PySide6、pypdf 與 cryptography。
+- 從原始碼啟動時，`run.sh` 會在 `.venv` 安裝 `requirements.txt` 的套件（含 pypdfium2 與 Pillow）。
 - `.deb` 建議安裝 `fonts-noto-cjk`（中文字型）與 `xdg-utils`（開啟輸出 PDF）；兩者列為 Recommends。
-- 沒有 `poppler-utils` 時仍可合併，但不會顯示頁面縮圖。
+- Linux 沒有 `poppler-utils` 時會改用內建的 PDFium 後端；Windows 版不需要 poppler。
 
 以 Debian／Ubuntu 手動補齊縮圖工具：
 
@@ -117,17 +129,25 @@ sudo apt install poppler-utils
 ./packaging/build-deb.sh
 ```
 
-輸出為 `dist/pdf-page-merger_1.0.1-1_all.deb`，並附上 `dist/SHA256SUMS`。可用環境變數改版號：
+輸出為 `dist/pdf-page-merger_1.1.0-1_all.deb`，並附上 `dist/SHA256SUMS`。可用環境變數改版號：
 
 ```bash
 VERSION=1.1.0 REVISION=1 ./packaging/build-deb.sh
 ```
 
-建置只需要 `dpkg-deb`、`gzip` 與 `desktop-file-validate`（後者為選用驗證）。
+建置 Linux 套件只需要 `dpkg-deb`、`gzip` 與 `desktop-file-validate`（後者為選用驗證）。
+
+Windows 可攜版由 GitHub Actions 的 Windows runner 建置：
+
+```bash
+gh workflow run windows.yml
+```
+
+或參考 `windows/build.ps1` 在 Windows 本機執行 PyInstaller。
 
 ## 發佈到 GitHub
 
-版本庫已包含 `v1.0.1` 標籤與發佈說明。登入 GitHub CLI 後可一次建立遠端、推送並建立 Release：
+版本庫已包含 `v1.1.0` 標籤與發佈說明。登入 GitHub CLI 後可一次建立遠端、推送並建立 Release：
 
 ```bash
 sudo apt install gh
@@ -173,10 +193,14 @@ pdf-merger/
 ├── pdf_engine.py            # 解密、縮圖、合併（無 Qt 相依）
 ├── workers.py               # 背景縮圖與合併工作
 ├── icons.py / theme.py      # 介面圖示與樣式
-├── assets/                  # SVG／PNG 應用程式圖示
+├── platform_support.py      # Windows／Linux 字型選擇
+├── assets/                  # SVG／PNG／ICO 應用程式圖示
 ├── packaging/               # .deb 建置腳本、desktop、man、授權與 changelog
-├── dist/                    # 建置產物：.deb 與 SHA256SUMS
+├── windows/                 # Windows PyInstaller 建置腳本、icon resource、使用說明
+├── .github/workflows/       # Windows CI 建置流程
+├── dist/                    # 建置產物：.deb、Windows zip 與 SHA256SUMS
 ├── tests/                   # 單元測試、GUI 測試、範例 PDF 產生器
+├── THIRD_PARTY_NOTICES.md   # Windows bundle 的第三方授權說明
 ├── run.sh
 └── install-desktop-entry.sh
 ```

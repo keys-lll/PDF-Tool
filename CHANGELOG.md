@@ -5,6 +5,21 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-26
+
+### Added
+
+- 新增 Windows 10／11 x64 可攜版，使用 PyInstaller 打包為免安裝 zip。
+- 新增 PDFium（pypdfium2）縮圖後端；Windows 不需要安裝 poppler。
+- 依平台選擇中文字型（Windows 使用 Microsoft JhengHei UI）。
+- 新增 packaged application 的 `--smoke-test` 自我檢查。
+- 新增 Windows GitHub Actions 建置與測試流程。
+
+### Changed
+
+- Python 執行期需求加入 pypdfium2 與 Pillow；Linux 套件仍優先使用 poppler。
+- 測試總數增加至 23 項。
+
 ## [1.0.1] - 2026-10-25
 
 ### Fixed
