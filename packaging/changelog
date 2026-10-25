@@ -1,3 +1,10 @@
+pdf-page-merger (1.0.1-1) unstable; urgency=medium
+
+  * Fix a race when merge completion closes the progress dialog while it is
+    processing events inside setValue().
+
+ -- Local Package Builder <local@localhost>  Sun, 25 Oct 2026 17:05:00 +0800
+
 pdf-page-merger (1.0.0-1) unstable; urgency=medium
 
   * Initial local release.

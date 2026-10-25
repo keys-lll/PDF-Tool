@@ -2,7 +2,7 @@
 
 本機桌面工具：把多份 PDF 合併成一份，並用縮圖逐頁調整順序。加密的 PDF 會在加入時逐份詢問密碼；當下不想輸入也可以先跳過，之後再從左側清單解鎖。
 
-目前版本：**1.0.0** · [版本歷程](CHANGELOG.md) · [v1.0.0 發佈說明](docs/release-notes-v1.0.0.md)
+目前版本：**1.0.1** · [版本歷程](CHANGELOG.md) · [v1.0.1 發佈說明](docs/release-notes-v1.0.1.md)
 
 ![PDF 併頁器主畫面](docs/screenshot.png)
 
@@ -24,7 +24,7 @@
 
 ```bash
 cd /home/liao/.zcode/workspace/449f8f0c-0603-4541-b26e-8bccd39a56b8/pdf-merger
-sudo apt install ./dist/pdf-page-merger_1.0.0-1_all.deb
+sudo apt install ./dist/pdf-page-merger_1.0.1-1_all.deb
 ```
 
 apt 會自動補齊 `python3-pypdf` 等缺少的依賴；安裝後可從應用程式選單啟動「PDF 併頁器」，或執行：
@@ -117,7 +117,7 @@ sudo apt install poppler-utils
 ./packaging/build-deb.sh
 ```
 
-輸出為 `dist/pdf-page-merger_1.0.0-1_all.deb`，並附上 `dist/SHA256SUMS`。可用環境變數改版號：
+輸出為 `dist/pdf-page-merger_1.0.1-1_all.deb`，並附上 `dist/SHA256SUMS`。可用環境變數改版號：
 
 ```bash
 VERSION=1.1.0 REVISION=1 ./packaging/build-deb.sh
@@ -127,7 +127,7 @@ VERSION=1.1.0 REVISION=1 ./packaging/build-deb.sh
 
 ## 發佈到 GitHub
 
-版本庫已包含 `v1.0.0` 標籤與發佈說明。登入 GitHub CLI 後可一次建立遠端、推送並建立 Release：
+版本庫已包含 `v1.0.1` 標籤與發佈說明。登入 GitHub CLI 後可一次建立遠端、推送並建立 Release：
 
 ```bash
 sudo apt install gh

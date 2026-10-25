@@ -33,7 +33,7 @@ def main() -> int:
     app = QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
     app.setApplicationDisplayName(APP_NAME)
-    app.setApplicationVersion("1.0.0")
+    app.setApplicationVersion("1.0.1")
     app.setDesktopFileName("pdf-page-merger")
     app.setStyle("Fusion")
     app.setFont(QFont("Noto Sans CJK TC", 10))
