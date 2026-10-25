@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import faulthandler
 import os
 import sys
 import tempfile
@@ -9,6 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+faulthandler.enable()
 
 from PySide6.QtCore import QEvent, QEventLoop, QPointF, QTimer, Qt
 from PySide6.QtGui import QFont, QMouseEvent
@@ -158,10 +160,13 @@ class UiFlowTests(unittest.TestCase):
         self.assertFalse(self.window._merging)
 
     def test_add_reorder_and_remove_pages(self) -> None:
+        print("DIAG: add/reorder test start", flush=True)
         report = PROJECT / "tests" / "samples" / "季度營運報告.pdf"
         design = PROJECT / "tests" / "samples" / "設計提案_首頁改版.pdf"
         self.window.add_paths([report, design])
+        print("DIAG: add_paths returned", flush=True)
         self._wait_for_thumbnails()
+        print("DIAG: thumbnails ready", flush=True)
 
         self.assertEqual(self.window.page_list.count(), 7)
         self.assertTrue(self.window.merge_button.isEnabled())
@@ -175,7 +180,9 @@ class UiFlowTests(unittest.TestCase):
 
         first_ref = self.window.page_list.item(0).data(PAGE_REF_ROLE)
         target_ref = self.window.page_list.item(3).data(PAGE_REF_ROLE)
+        print("DIAG: before synthetic drag", flush=True)
         drag_page(self.window.page_list, 0, 3)
+        print("DIAG: after synthetic drag", flush=True)
         self.assertEqual(self.window.page_list.item(3).data(PAGE_REF_ROLE), first_ref)
         self.assertEqual(self.window.page_list.item(2).data(PAGE_REF_ROLE), target_ref)
         self.assertEqual(self.window.page_list.currentRow(), 3)
@@ -196,6 +203,7 @@ class UiFlowTests(unittest.TestCase):
         self.window.page_list.clearSelection()
         self.window.page_list.item(0).setSelected(True)
         self.window._remove_selected_pages()
+        print("DIAG: after delete", flush=True)
         self.assertEqual(self.window.page_list.count(), 6)
         self.assertIn("6 頁", self.window.page_subtitle.text())
 
