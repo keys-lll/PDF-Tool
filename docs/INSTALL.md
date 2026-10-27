@@ -1,22 +1,22 @@
 # 安裝、建置與測試
 
 功能與操作介紹請見 [README](../README.md)。本文件說明安裝、開發環境、打包、
-測試與發佈流程，對應版本 **1.1.0**。
+測試與發佈流程，對應版本 **1.1.1**。
 
 ## 下載
 
 版本發佈後可從 [GitHub Releases](https://github.com/keys-lll/PDF-Tool/releases)
 下載：
 
-- Windows：`PDF-Page-Merger-1.1.0-windows-x64.zip`
-- Debian／Ubuntu：`pdf-page-merger_1.1.0-1_all.deb`
+- Windows：`PDF-Page-Merger-1.1.1-windows-x64.zip`
+- Debian／Ubuntu：`pdf-page-merger_1.1.1-1_all.deb`
 - `SHA256SUMS`：下載檔完整性校驗
 
 若此版本尚未發佈，本機建置的檔案位於專案的 `dist/` 資料夾。
 
 ## Windows 可攜版
 
-1. 解壓縮 `PDF-Page-Merger-1.1.0-windows-x64.zip`。
+1. 解壓縮 `PDF-Page-Merger-1.1.1-windows-x64.zip`。
 2. 執行 `PDF-Page-Merger` 資料夾內的 `PDF-Page-Merger.exe`。
 3. 保留 `_internal` 資料夾，不要只複製 exe。
 
@@ -27,7 +27,7 @@
 ## Debian／Ubuntu 套件
 
 ```bash
-sudo apt install ./pdf-page-merger_1.1.0-1_all.deb
+sudo apt install ./pdf-page-merger_1.1.1-1_all.deb
 ```
 
 apt 會自動補齊 `python3-pypdf` 等缺少的依賴。安裝後可從應用程式選單啟動
@@ -96,11 +96,11 @@ cd /home/liao/.zcode/workspace/449f8f0c-0603-4541-b26e-8bccd39a56b8/pdf-merger
 ./packaging/build-deb.sh
 ```
 
-輸出為 `dist/pdf-page-merger_1.1.0-1_all.deb`，並更新 `dist/SHA256SUMS`。
+輸出為 `dist/pdf-page-merger_1.1.1-1_all.deb`，並更新 `dist/SHA256SUMS`。
 可用環境變數改版號：
 
 ```bash
-VERSION=1.1.0 REVISION=1 ./packaging/build-deb.sh
+VERSION=1.1.1 REVISION=1 ./packaging/build-deb.sh
 ```
 
 建置只需要 `dpkg-deb`、`gzip` 與 `desktop-file-validate`（後者為選用驗證）。
@@ -110,24 +110,24 @@ VERSION=1.1.0 REVISION=1 ./packaging/build-deb.sh
 Windows 版本由 GitHub Actions 的 Windows runner 建置：
 
 ```bash
-gh workflow run windows.yml --ref main -f version=1.1.0
+gh workflow run windows.yml --ref main -f version=1.1.1
 gh run watch <run-id>
 ```
 
 流程會：
 
 1. 安裝 `requirements-build.txt`。
-2. 產生範例 PDF 並執行 24 項測試。
+2. 產生範例 PDF 並執行 25 項測試。
 3. 用 PyInstaller 建立 `PDF-Page-Merger` 可攜資料夾。
 4. 檢查 `pdfium.dll` 已包含。
 5. 執行凍結版本的 `--smoke-test`。
-6. 上傳 `PDF-Page-Merger-1.1.0-windows-x64.zip` artifact。
+6. 上傳 `PDF-Page-Merger-1.1.1-windows-x64.zip` artifact。
 
 也可以在 Windows 本機執行：
 
 ```powershell
 python -m pip install -r requirements-build.txt
-.\windows\build.ps1 -Version 1.1.0
+.\windows\build.ps1 -Version 1.1.1
 ```
 
 ## 測試

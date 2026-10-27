@@ -82,7 +82,7 @@ def main() -> int:
         return _run_smoke_test()
     app.setApplicationName(APP_NAME)
     app.setApplicationDisplayName(APP_NAME)
-    app.setApplicationVersion("1.1.0")
+    app.setApplicationVersion("1.1.1")
     app.setDesktopFileName("pdf-page-merger")
     app.setStyle("Fusion")
     font_family = ui_font_family()

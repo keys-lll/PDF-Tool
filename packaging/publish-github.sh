@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# 在完成 `gh auth login` 之後，建立 GitHub 倉庫、推送 main 與 v1.1.0，
+# 在完成 `gh auth login` 之後，建立 GitHub 倉庫、推送 main 與 v1.1.1，
 # 並建立附帶 .deb 的 GitHub Release。
 #
 # 用法：
@@ -15,11 +15,11 @@ cd -- "$ROOT_DIR"
 
 REPO_NAME="${REPO_NAME:-pdf-page-merger}"
 VISIBILITY="${VISIBILITY:-private}"
-TAG="v1.1.0"
-DEB="$ROOT_DIR/dist/pdf-page-merger_1.1.0-1_all.deb"
+TAG="v1.1.1"
+DEB="$ROOT_DIR/dist/pdf-page-merger_1.1.1-1_all.deb"
 SUMS="$ROOT_DIR/dist/SHA256SUMS"
-WINDOWS_ZIP="$ROOT_DIR/dist/PDF-Page-Merger-1.1.0-windows-x64.zip"
-NOTES="$ROOT_DIR/docs/release-notes-v1.1.0.md"
+WINDOWS_ZIP="$ROOT_DIR/dist/PDF-Page-Merger-1.1.1-windows-x64.zip"
+NOTES="$ROOT_DIR/docs/release-notes-v1.1.1.md"
 DESCRIPTION="PDF 併頁器 — merge PDFs and reorder pages with per-file password support"
 
 case "$VISIBILITY" in

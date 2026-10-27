@@ -3,7 +3,7 @@ set -euo pipefail
 
 APP_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 PACKAGE="pdf-page-merger"
-VERSION="${VERSION:-1.1.0}"
+VERSION="${VERSION:-1.1.1}"
 REVISION="${REVISION:-1}"
 ARCH="all"
 FULL_VERSION="${VERSION}-${REVISION}"
@@ -71,6 +71,8 @@ install -m644 "$APP_DIR/docs/release-notes-v1.0.1.md" \
     "$STAGE/usr/share/doc/$PACKAGE/docs/release-notes-v1.0.1.md"
 install -m644 "$APP_DIR/docs/release-notes-v1.1.0.md" \
     "$STAGE/usr/share/doc/$PACKAGE/docs/release-notes-v1.1.0.md"
+install -m644 "$APP_DIR/docs/release-notes-v1.1.1.md" \
+    "$STAGE/usr/share/doc/$PACKAGE/docs/release-notes-v1.1.1.md"
 install -m644 "$APP_DIR/packaging/copyright" "$STAGE/usr/share/doc/$PACKAGE/copyright"
 install -m644 "$APP_DIR/docs/screenshot.png" "$STAGE/usr/share/doc/$PACKAGE/docs/screenshot.png"
 install -m644 "$APP_DIR/docs/password-dialog.png" "$STAGE/usr/share/doc/$PACKAGE/docs/password-dialog.png"
