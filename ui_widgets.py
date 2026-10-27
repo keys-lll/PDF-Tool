@@ -31,7 +31,8 @@ class ElidedLabel(QLabel):
         super().__init__(parent)
         self._full_text = text
         self._mode = Qt.TextElideMode.ElideMiddle
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self._refreshing = False
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         self.setMinimumWidth(0)
         self.setAccessibleName(text)
         self._refresh()
@@ -46,9 +47,20 @@ class ElidedLabel(QLabel):
         self._refresh()
 
     def _refresh(self) -> None:
+        # setText() can synchronously trigger another layout/resize event.
+        # Without this guard a long filename can recurse until Qt crashes.
+        if self._refreshing:
+            return
         width = max(0, self.contentsRect().width())
         metrics = QFontMetrics(self.font())
-        super().setText(metrics.elidedText(self._full_text, self._mode, width))
+        elided = metrics.elidedText(self._full_text, self._mode, width)
+        if elided == self.text():
+            return
+        self._refreshing = True
+        try:
+            super().setText(elided)
+        finally:
+            self._refreshing = False
 
 
 class SourceRow(QFrame):

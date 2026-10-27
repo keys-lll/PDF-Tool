@@ -3,6 +3,7 @@ from __future__ import annotations
 import faulthandler
 import hashlib
 import os
+import shutil
 import sys
 import tempfile
 import time
@@ -22,6 +23,7 @@ PROJECT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT))
 
 from main_window import MainWindow  # noqa: E402
+from pdf_engine import PasswordRequired  # noqa: E402
 from platform_support import ui_font_family  # noqa: E402
 from theme import build_stylesheet  # noqa: E402
 from ui_pages import PAGE_REF_ROLE  # noqa: E402
@@ -201,6 +203,26 @@ class UiFlowTests(unittest.TestCase):
         self.window._remove_selected_pages()
         self.assertEqual(self.window.page_list.count(), 6)
         self.assertIn("6 頁", self.window.page_subtitle.text())
+
+    def test_long_encrypted_filename_opens_password_dialog(self) -> None:
+        long_name = "002806532903602921780" * 2 + ".pdf"
+        path = self.root / long_name
+        shutil.copy2(PROJECT / "tests" / "samples" / "機密_董事會附件.pdf", path)
+        source = self.window.workspace.add_source(path)
+        self.window._add_source_row(source)
+        with self.assertRaises(PasswordRequired):
+            self.window.workspace.inspect(source)
+        self.window._refresh_source(source)
+        self.window._update_state()
+
+        def reject_dialog() -> None:
+            dialog = QApplication.activeModalWidget()
+            self.assertIsInstance(dialog, PasswordDialog)
+            dialog.reject()
+
+        QTimer.singleShot(150, reject_dialog)
+        self.window._prompt_for_password(source)
+        self.assertEqual(source.status, "locked")
 
     def test_password_dialog_validation(self) -> None:
         seen: list[str] = []
